@@ -38,23 +38,27 @@ def toNoResultXml(error):
     print "    <icon type=\"fileicon\">/Applications/Dictionary.app</icon>"
     print "</item>"
 
-theQuery = 'alibaba'
+theQuery = '{query}'
 theQuery = theQuery.strip()
 url = 'http://fanyi.youdao.com/openapi.do?keyfrom=xxx&key=xxx&type=data&doctype=json&version=1.1&q='+theQuery
 ret = json.loads(urllib.urlopen(url.encode('utf-8')).read())
 error = ret['errorCode']
 print "<?xml version=\"1.0\"?>\n<items>"
+phonetic = ''
 if error == 0:
-    basic = ret['basic']
-    web = ret['web']
-    trans = ret['translation']
-    if basic.has_key('name'):
-        phonetic = '['+basic['phonetic']+']'
-    else:
-        phonetic = ''
-    toXmlTrans(trans, phonetic)
-    toXmlBasic(basic)
-    toXmlWeb(web)
+    if ret.has_key('basic'):
+        basic = ret['basic']
+        if basic.has_key('phonetic'):
+            phonetic = ' ['+basic['phonetic']+']'
+    if ret.has_key('translation'):
+        trans = ret['translation']
+        toXmlTrans(trans, phonetic)
+    if ret.has_key('basic'):
+        basic = ret['basic']
+        toXmlBasic(basic)
+    if ret.has_key('web'):
+        web = ret['web']
+        toXmlWeb(web)
 else:
     toNoResultXml(error)
 print "</items>\n"
